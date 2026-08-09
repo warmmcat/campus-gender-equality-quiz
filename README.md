@@ -1,12 +1,21 @@
 # 大專性平知識大會考
 
-此儲存庫用於將現有測驗網站移轉至 GitHub Pages，並以 Supabase 提供 Google 帳號登入、題庫、作答紀錄與管理員權限。
+GitHub Pages 靜態前端，使用 Supabase Auth、Database 與 RLS。
 
-## 預定架構
+## 安全設計
 
-- GitHub Pages：公開網站
-- Supabase Auth：Google 登入／登出
-- Supabase Database + RLS：題庫、成績與權限
-- 唯一管理員：`warmmcat@gmail.com`
+- 前端只包含 Supabase publishable key；不包含 secret/service_role key。
+- 學生只能建立及讀取自己的完成紀錄。
+- `warmmcat@gmail.com` 是唯一管理員，管理權限由資料庫 RLS 驗證。
+- 不長期保存個別題目的作答選擇。
+- 完成紀錄超過一年由 Supabase Cron 自動刪除。
 
-> 請勿將 Supabase `service_role` 金鑰或 Google OAuth Client Secret 提交至此儲存庫。
+## OAuth 設定
+
+Supabase Google provider 的 callback URL：
+
+`https://bnnoikfcztusxjhazsir.supabase.co/auth/v1/callback`
+
+正式網站 URL：
+
+`https://warmmcat.github.io/campus-gender-equality-quiz/`
