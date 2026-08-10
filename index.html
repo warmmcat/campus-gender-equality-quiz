@@ -80,12 +80,36 @@
       </section>
     </section>
 
-    <section id="resultView" class="panel hidden">
-      <p class="eyebrow">測驗完成</p>
-      <h2 id="scoreText"></h2>
+    <section id="resultView" class="panel result-page hidden">
+      <div id="certificateSheet" class="certificate-sheet">
+        <div class="result-title">
+          <span>測驗完成</span>
+          <h1>校園性別平等知識小測驗成績單</h1>
+          <p id="certificateUser"></p>
+        </div>
+        <div class="score-card">
+          <div class="score-ring"><strong id="scorePercent"></strong><span>分</span></div>
+          <div class="score-summary">
+            <span id="scoreGrade" class="grade"></span>
+            <h2 id="scoreText"></h2>
+            <p id="scoreDetail"></p>
+          </div>
+          <div class="certificate-meta">
+            <small>完成日期</small><b id="completionDate"></b>
+            <small>成績單編號</small><b id="certificateNumber"></b>
+          </div>
+        </div>
+        <div class="certificate-note">
+          <b>完成證明</b>
+          <p>本成績單證明答題者已完成校園性別平等知識測驗與逐題學習。</p>
+        </div>
+      </div>
       <p class="result-intro">謝謝你的參與。答案解析不只是告訴你對錯，也幫助我們在日常互動中做出更尊重的選擇。</p>
       <div id="reviewList" class="review-list"></div>
-      <button id="retryButton" class="button primary" type="button">再測一次 <span>→</span></button>
+      <div class="result-actions">
+        <button id="downloadResultButton" class="button primary" type="button">下載 A4 PDF 成績單</button>
+        <button id="retryButton" class="button" type="button">再測一次 <span>→</span></button>
+      </div>
     </section>
 
     <section id="adminView" class="panel admin-panel hidden">
