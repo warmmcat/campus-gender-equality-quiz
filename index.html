@@ -64,6 +64,20 @@
         <button class="answer-button correct-option" data-answer="true"><b>○</b><span>這個敘述正確</span></button>
         <button class="answer-button wrong-option" data-answer="false"><b>×</b><span>這個敘述錯誤</span></button>
       </div>
+      <section id="answerFeedback" class="answer-feedback hidden" aria-live="assertive">
+        <div class="feedback-heading">
+          <span id="feedbackIcon" class="feedback-icon" aria-hidden="true"></span>
+          <div>
+            <p id="feedbackResult" class="feedback-result"></p>
+            <p id="feedbackAnswer" class="feedback-answer"></p>
+          </div>
+        </div>
+        <div class="feedback-explanation">
+          <strong>解答說明</strong>
+          <p id="feedbackExplanation"></p>
+        </div>
+        <button id="nextButton" class="button primary next-button" type="button">下一題 <span>→</span></button>
+      </section>
     </section>
 
     <section id="resultView" class="panel hidden">
