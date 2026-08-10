@@ -3,67 +3,96 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="大專性平知識大會考" />
-  <title>大專性平知識大會考</title>
+  <meta name="description" content="給大專校院學生的校園性別平等知識測驗" />
+  <title>校園性別平等知識小測驗</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&family=Noto+Serif+TC:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="./">大專性平知識大會考</a>
-    <nav>
-      <button id="adminNav" class="link-button hidden">管理後台</button>
-      <button id="authButton" class="button">使用 Google 登入</button>
+    <a class="brand" href="./" aria-label="回到首頁">
+      <span class="brand-mark">平</span>
+      <span><strong>校園性平知識小測驗</strong><small>Campus Gender Equality Quiz</small></span>
+    </a>
+    <nav aria-label="主要導覽">
+      <button class="nav-item active" type="button" id="studentNav">學生測驗</button>
+      <button id="adminNav" class="nav-item hidden" type="button">管理後台</button>
     </nav>
+    <div class="account">
+      <span class="account-avatar" aria-hidden="true">訪</span>
+      <span class="account-copy"><strong id="accountName">訪客</strong><small id="accountStatus">尚未登入</small></span>
+      <button id="authButton" class="auth-button" type="button">Google 登入</button>
+    </div>
   </header>
+
   <main>
-    <section id="homeView" class="hero">
-      <p class="eyebrow">臺北醫學大學學生輔導中心</p>
-      <h1>性平知識，從理解開始</h1>
-      <p class="lead">登入 Google 帳號，完成 10 題是非題，立即查看解析。</p>
-      <div id="accountStatus" class="status">尚未登入</div>
-      <button id="startButton" class="button primary">登入後開始測驗</button>
+    <section id="homeView" class="hero page">
+      <div class="hero-copy">
+        <p class="eyebrow">給大專校院學生的性平知識測驗</p>
+        <h1>懂得尊重，<br><em>讓校園更自在。</em></h1>
+        <p class="lead">從日常情境出發，測測你對性別平等、身體界線與校園求助資源了解多少。<br>每一題都有清楚解析，不只是答對，更要真正理解。</p>
+        <div class="hero-actions">
+          <button id="startButton" class="button primary" type="button">登入後開始測驗 <span>→</span></button>
+          <span>10 題 · 每次隨機抽題 · 完成後立即看解析</span>
+        </div>
+        <p class="privacy-note"><span>✓</span> 作答紀錄僅供校內性平教育統計使用</p>
+      </div>
+      <div class="values-graphic" aria-label="尊重、理解、行動">
+        <div class="orbit orbit-outer"><span class="value value-respect">尊重</span></div>
+        <div class="orbit orbit-middle"><span class="value value-understand">理解</span></div>
+        <div class="orbit orbit-inner"></div>
+        <span class="value value-action">行動</span>
+      </div>
+      <div class="topics" aria-label="測驗六大主題">
+        <article><b>01</b><div><strong>尊重與界線</strong><span>理解同意與身體自主</span></div></article>
+        <article><b>02</b><div><strong>校園性平事件</strong><span>辨識情境與求助管道</span></div></article>
+        <article><b>03</b><div><strong>師生權勢關係</strong><span>認識師生專業倫理與互動的適當界線</span></div></article>
+        <article><b>04</b><div><strong>性侵害與求助</strong><span>了解遭遇事件後可使用的醫療、通報、輔導與法律資源</span></div></article>
+        <article><b>05</b><div><strong>網路與隱私</strong><span>在數位互動中尊重性自主、影像隱私與個人界線</span></div></article>
+        <article><b>06</b><div><strong>申訴與調查</strong><span>了解申請、通報程序、個人權利與可獲得的協助</span></div></article>
+      </div>
     </section>
 
-    <section id="quizView" class="panel hidden" aria-live="polite">
+    <section id="quizView" class="panel quiz-panel hidden" aria-live="polite">
+      <div class="panel-kicker">學生測驗</div>
       <div class="progress-row"><span id="progressText"></span><progress id="progressBar" max="10"></progress></div>
       <h2 id="questionText"></h2>
+      <p class="answer-hint">請判斷以下敘述是否正確</p>
       <div class="answer-grid">
-        <button class="answer-button" data-answer="true">○ 這個敘述正確</button>
-        <button class="answer-button" data-answer="false">× 這個敘述錯誤</button>
+        <button class="answer-button correct-option" data-answer="true"><b>○</b><span>這個敘述正確</span></button>
+        <button class="answer-button wrong-option" data-answer="false"><b>×</b><span>這個敘述錯誤</span></button>
       </div>
     </section>
 
     <section id="resultView" class="panel hidden">
       <p class="eyebrow">測驗完成</p>
       <h2 id="scoreText"></h2>
+      <p class="result-intro">謝謝你的參與。答案解析不只是告訴你對錯，也幫助我們在日常互動中做出更尊重的選擇。</p>
       <div id="reviewList" class="review-list"></div>
-      <button id="retryButton" class="button primary">再測一次</button>
+      <button id="retryButton" class="button primary" type="button">再測一次 <span>→</span></button>
     </section>
 
-    <section id="adminView" class="panel hidden">
-      <div class="section-heading"><div><p class="eyebrow">管理員專區</p><h2>題庫與測驗紀錄</h2></div><button id="closeAdmin" class="button">返回首頁</button></div>
+    <section id="adminView" class="panel admin-panel hidden">
+      <div class="section-heading"><div><p class="eyebrow">管理員專區</p><h2>題庫與測驗紀錄</h2></div><button id="closeAdmin" class="button" type="button">返回首頁</button></div>
       <p id="adminMessage" class="status"></p>
       <div class="admin-grid">
         <div><h3>題庫</h3><div id="questionAdminList"></div></div>
         <div><h3>完成紀錄</h3><div id="attemptList"></div></div>
       </div>
     </section>
-
-    <section class="topics">
-      <article><b>01. 尊重與界線</b><span>理解同意與身體自主</span></article>
-      <article><b>02. 校園性平事件</b><span>辨識情境與求助管道</span></article>
-      <article><b>03. 師生權勢關係</b><span>認識師生專業倫理與互動的適當界線</span></article>
-      <article><b>04. 性侵害與求助</b><span>了解醫療、通報、輔導與法律資源</span></article>
-      <article><b>05. 網路與隱私</b><span>尊重性自主、影像隱私與個人界線</span></article>
-      <article><b>06. 申訴與調查</b><span>了解申請、通報程序與可獲得的協助</span></article>
-    </section>
   </main>
+
   <footer>
     <span>© 2026 臺北醫學大學學生輔導中心</span>
-    <a href="https://ismart.tmu.edu.tw/front/GECE1/pages.php?ID=776df906053d815350e7e70a23104001" target="_blank" rel="noopener">資源連結</a>
-    <a href="mailto:gender@tmu.edu.tw">聯絡性平窗口</a>
-    <a href="./privacy.html">隱私權政策</a>
+    <nav aria-label="頁尾連結">
+      <a href="./privacy.html">隱私權政策</a><i>·</i>
+      <a href="mailto:gender@tmu.edu.tw">聯絡性平窗口</a><i>·</i>
+      <a href="https://ismart.tmu.edu.tw/front/GECE1/pages.php?ID=776df906053d815350e7e70a23104001" target="_blank" rel="noopener">資源連結</a>
+    </nav>
   </footer>
+
   <dialog id="editDialog">
     <form id="editForm" method="dialog">
       <h2>修改題目</h2>
