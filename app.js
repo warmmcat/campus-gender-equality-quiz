@@ -9,6 +9,7 @@ let session = null;
 let quiz = [];
 let index = 0;
 let answers = [];
+let awaitingNext = false;
 
 function show(view) {
   ['homeView','quizView','resultView','adminView'].forEach(id => $(id).classList.toggle('hidden', id !== view));
@@ -57,7 +58,7 @@ async function startQuiz() {
     return;
   }
   quiz = shuffle(data).slice(0, Math.min(10, data.length));
-  index = 0; answers = [];
+  index = 0; answers = []; awaitingNext = false;
   show('quizView'); renderQuestion();
 }
 
@@ -65,12 +66,42 @@ function renderQuestion() {
   $('progressText').textContent = `第 ${index + 1} 題／共 ${quiz.length} 題`;
   $('progressBar').max = quiz.length; $('progressBar').value = index + 1;
   $('questionText').textContent = quiz[index].prompt;
+  $('answerFeedback').classList.add('hidden');
+  document.querySelectorAll('[data-answer]').forEach(button => {
+    button.disabled = false;
+    button.classList.remove('selected-answer', 'is-correct', 'is-wrong');
+  });
 }
 
-async function chooseAnswer(value) {
-  answers.push(value === quiz[index].correct_answer);
-  index += 1;
-  if (index < quiz.length) return renderQuestion();
+function answerLabel(value) {
+  return value ? '○ 正確' : '× 錯誤';
+}
+
+function chooseAnswer(value) {
+  if (awaitingNext) return;
+  const question = quiz[index];
+  const isCorrect = value === question.correct_answer;
+  answers.push(isCorrect);
+  awaitingNext = true;
+
+  document.querySelectorAll('[data-answer]').forEach(button => {
+    const buttonValue = button.dataset.answer === 'true';
+    button.disabled = true;
+    if (buttonValue === value) button.classList.add('selected-answer');
+    if (buttonValue === question.correct_answer) button.classList.add('is-correct');
+    else if (buttonValue === value) button.classList.add('is-wrong');
+  });
+
+  $('feedbackIcon').textContent = isCorrect ? '✓' : '!';
+  $('feedbackResult').textContent = isCorrect ? '答對了！' : '再想一想，這題答錯了';
+  $('feedbackAnswer').textContent = `你的答案：${answerLabel(value)}｜正確答案：${answerLabel(question.correct_answer)}`;
+  $('feedbackExplanation').textContent = question.explanation || '本題暫無解答說明。';
+  $('answerFeedback').className = `answer-feedback ${isCorrect ? 'feedback-correct' : 'feedback-wrong'}`;
+  $('nextButton').innerHTML = index === quiz.length - 1 ? '查看測驗結果 <span>→</span>' : '下一題 <span>→</span>';
+  $('nextButton').focus();
+}
+
+async function finishQuiz() {
   const score = answers.filter(Boolean).length;
   const { error } = await supabase.from('quiz_attempts').insert({ user_id: session.user.id, score, max_score: quiz.length });
   $('scoreText').textContent = `${score}／${quiz.length} 分`;
@@ -78,11 +109,21 @@ async function chooseAnswer(value) {
     const article = document.createElement('article');
     const title = document.createElement('b');
     title.textContent = `${answers[i] ? '答對' : '答錯'}｜${q.prompt}`;
+    const answer = document.createElement('small');
+    answer.textContent = `正確答案：${answerLabel(q.correct_answer)}`;
     const p = document.createElement('p'); p.textContent = q.explanation || '本題暫無解答說明。';
-    article.append(title, p); return article;
+    article.append(title, answer, p); return article;
   }));
   if (error) $('scoreText').textContent += '（紀錄儲存失敗）';
   show('resultView');
+}
+
+async function nextQuestion() {
+  if (!awaitingNext) return;
+  awaitingNext = false;
+  index += 1;
+  if (index < quiz.length) return renderQuestion();
+  await finishQuiz();
 }
 
 async function openAdmin() {
@@ -126,6 +167,7 @@ async function saveQuestion(event) {
 $('authButton').addEventListener('click', toggleAuth);
 $('startButton').addEventListener('click', startQuiz);
 $('retryButton').addEventListener('click', startQuiz);
+$('nextButton').addEventListener('click', nextQuestion);
 $('adminNav').addEventListener('click', openAdmin);
 $('closeAdmin').addEventListener('click', () => show('homeView'));
 $('studentNav').addEventListener('click', () => show('homeView'));
