@@ -61,12 +61,31 @@ function chooseAnswer(value){
   $('answerFeedback').className=`answer-feedback ${correct?'feedback-correct':'feedback-wrong'}`;
   $('nextButton').innerHTML=index===quiz.length-1?'查看測驗結果 <span>→</span>':'下一題 <span>→</span>'; $('nextButton').focus();
 }
+function certificateIdentity(){
+  const metadata=session?.user?.user_metadata||{};
+  return metadata.full_name||metadata.name||session?.user?.email||'測驗參與者';
+}
+function certificateId(date){
+  const parts=new Intl.DateTimeFormat('zh-TW',{timeZone:'Asia/Taipei',year:'2-digit',month:'2-digit',day:'2-digit'}).formatToParts(date);
+  const value=type=>parts.find(part=>part.type===type)?.value||'00';
+  const suffix=String(Math.floor(1000+Math.random()*9000));
+  return `GEQ-${value('year')}${value('month')}${value('day')}-${suffix}`;
+}
 async function finishQuiz(){
   const score=answers.filter(Boolean).length;
+  const percentage=quiz.length?Math.round(score/quiz.length*100):0;
+  const completedAt=new Date();
   const {error}=await supabase.from('quiz_attempts').insert({user_id:session.user.id,user_email:session.user.email.toLowerCase(),score,max_score:quiz.length});
-  $('scoreText').textContent=`${score}／${quiz.length} 分`;
+  $('certificateUser').textContent=`${certificateIdentity()} 已完成本次測驗`;
+  $('scorePercent').textContent=percentage;
+  $('scoreGrade').textContent=percentage>=80?'性平知識達人':'持續學習中';
+  $('scoreText').textContent=`答對 ${score}／${quiz.length} 題`;
+  $('scoreDetail').textContent=`本次成績 ${percentage} 分（共 ${quiz.length} 題）。`;
+  $('completionDate').textContent=new Intl.DateTimeFormat('zh-TW',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).format(completedAt);
+  $('certificateNumber').textContent=certificateId(completedAt);
   $('reviewList').replaceChildren(...quiz.map((q,i)=>{const a=document.createElement('article'),b=document.createElement('b'),s=document.createElement('small'),p=document.createElement('p');b.textContent=`${answers[i]?'答對':'答錯'}｜${q.prompt}`;s.textContent=`正確答案：${answerLabel(q.correct_answer)}`;p.textContent=q.explanation||'本題暫無解答說明。';a.append(b,s,p);return a;}));
-  if(error)$('scoreText').textContent+='（紀錄儲存失敗）'; show('resultView');
+  if(error)$('scoreDetail').textContent+=' 作答紀錄儲存失敗。';
+  show('resultView');
 }
 async function nextQuestion(){ if(!awaitingNext)return; awaitingNext=false; index++; if(index<quiz.length)return renderQuestion(); await finishQuiz(); }
 
@@ -160,7 +179,7 @@ async function importQuestions(){
   }catch(error){setAdminMessage(`匯入失敗：${error.message}`,'error');}
 }
 
-$('authButton').addEventListener('click',toggleAuth);$('startButton').addEventListener('click',startQuiz);$('retryButton').addEventListener('click',startQuiz);$('nextButton').addEventListener('click',nextQuestion);
+$('authButton').addEventListener('click',toggleAuth);$('startButton').addEventListener('click',startQuiz);$('retryButton').addEventListener('click',startQuiz);$('downloadResultButton').addEventListener('click',()=>window.print());$('nextButton').addEventListener('click',nextQuestion);
 $('adminNav').addEventListener('click',openAdmin);$('closeAdmin').addEventListener('click',()=>show('homeView'));$('studentNav').addEventListener('click',()=>show('homeView'));
 $('settingsForm').addEventListener('submit',saveSettings);$('recordMonth').addEventListener('change',loadAttempts);$('previousMonth').addEventListener('click',()=>shiftMonth(-1));$('nextMonth').addEventListener('click',()=>shiftMonth(1));$('exportCsv').addEventListener('click',exportAttempts);
 $('questionSearch').addEventListener('input',renderQuestions);$('questionStatus').addEventListener('change',renderQuestions);$('addQuestion').addEventListener('click',()=>editQuestion());$('importQuestions').addEventListener('click',importQuestions);
