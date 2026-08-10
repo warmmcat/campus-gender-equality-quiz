@@ -89,11 +89,68 @@
     </section>
 
     <section id="adminView" class="panel admin-panel hidden">
-      <div class="section-heading"><div><p class="eyebrow">管理員專區</p><h2>題庫與測驗紀錄</h2></div><button id="closeAdmin" class="button" type="button">返回首頁</button></div>
-      <p id="adminMessage" class="status"></p>
-      <div class="admin-grid">
-        <div><h3>題庫</h3><div id="questionAdminList"></div></div>
-        <div><h3>完成紀錄</h3><div id="attemptList"></div></div>
+      <div class="section-heading">
+        <div><p class="eyebrow">管理員專區</p><h2>測驗管理後台</h2></div>
+        <button id="closeAdmin" class="button" type="button">返回首頁</button>
+      </div>
+      <p id="adminMessage" class="status" aria-live="polite"></p>
+
+      <div class="admin-dashboard">
+        <section class="admin-card settings-card">
+          <div class="admin-card-heading"><div><span class="admin-icon">⚙</span><h3>測驗設定</h3></div></div>
+          <form id="settingsForm" class="inline-form">
+            <label for="questionCount">每次測驗題數</label>
+            <input id="questionCount" type="number" min="1" max="100" required>
+            <button class="button primary" type="submit">儲存設定</button>
+          </form>
+          <small>題數不得超過目前啟用中的題目數量。</small>
+        </section>
+
+        <section class="admin-card records-card">
+          <div class="admin-card-heading">
+            <div><span class="admin-icon">▦</span><h3>作答紀錄</h3></div>
+            <button id="exportCsv" class="button" type="button">匯出本月 CSV</button>
+          </div>
+          <div class="month-toolbar">
+            <button id="previousMonth" class="icon-button" type="button" aria-label="上一個月">‹</button>
+            <label>檢視月份<input id="recordMonth" type="month"></label>
+            <button id="nextMonth" class="icon-button" type="button" aria-label="下一個月">›</button>
+            <span id="recordSummary" class="record-summary"></span>
+          </div>
+          <div class="table-scroll">
+            <table class="admin-table">
+              <thead><tr><th>完成時間</th><th>Google 帳號</th><th>得分</th><th>正確率</th></tr></thead>
+              <tbody id="attemptList"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="admin-card import-card">
+          <div class="admin-card-heading"><div><span class="admin-icon">↑</span><h3>上傳題庫與解答</h3></div></div>
+          <p>支援 Excel（.xlsx／.xls）及 CSV。欄位可使用：題目、答案、解答說明、啟用、排序。</p>
+          <div class="import-controls">
+            <input id="questionFile" type="file" accept=".xlsx,.xls,.csv,text/csv">
+            <select id="importMode" aria-label="匯入方式">
+              <option value="append">新增至目前題庫</option>
+              <option value="replace">取代目前全部題庫</option>
+            </select>
+            <button id="importQuestions" class="button primary" type="button">開始匯入</button>
+          </div>
+          <small>「取代」會先刪除目前題庫，執行前會再次確認。答案可填 ○／×、正確／錯誤、true／false。</small>
+        </section>
+
+        <section class="admin-card questions-card">
+          <div class="admin-card-heading">
+            <div><span class="admin-icon">?</span><h3>目前題庫</h3></div>
+            <button id="addQuestion" class="button primary" type="button">＋ 新增題目</button>
+          </div>
+          <div class="question-filter">
+            <input id="questionSearch" type="search" placeholder="搜尋題目或解答">
+            <select id="questionStatus"><option value="all">全部狀態</option><option value="active">僅啟用</option><option value="inactive">僅停用</option></select>
+            <span id="questionSummary"></span>
+          </div>
+          <div id="questionAdminList" class="question-admin-list"></div>
+        </section>
       </div>
     </section>
   </main>
@@ -109,11 +166,15 @@
 
   <dialog id="editDialog">
     <form id="editForm" method="dialog">
-      <h2>修改題目</h2>
-      <input id="editId" type="hidden" />
-      <label>題目<textarea id="editPrompt" required></textarea></label>
-      <label>答案<select id="editAnswer"><option value="true">○ 正確</option><option value="false">× 錯誤</option></select></label>
-      <label>解答說明<textarea id="editExplanation"></textarea></label>
+      <h2 id="editDialogTitle">修改題目</h2>
+      <input id="editId" type="hidden">
+      <div class="form-grid">
+        <label class="full">題目<textarea id="editPrompt" rows="4" required></textarea></label>
+        <label>排序<input id="editPosition" type="number" min="1" required></label>
+        <label>答案<select id="editAnswer"><option value="true">○ 正確</option><option value="false">× 錯誤</option></select></label>
+        <label class="full">解答說明<textarea id="editExplanation" rows="5"></textarea></label>
+        <label class="check-label"><input id="editActive" type="checkbox" checked> 啟用這一題</label>
+      </div>
       <div class="dialog-actions"><button type="button" id="cancelEdit" class="button">取消</button><button type="submit" class="button primary">儲存</button></div>
     </form>
   </dialog>
