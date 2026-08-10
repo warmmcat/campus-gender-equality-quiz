@@ -19,8 +19,10 @@ function isAdmin() { return session?.user?.email?.toLowerCase() === ADMIN_EMAIL;
 async function refreshSession() {
   const { data } = await supabase.auth.getSession();
   session = data.session;
-  $('authButton').textContent = session ? '登出' : '使用 Google 登入';
-  $('accountStatus').textContent = session ? `已登入：${session.user.email}` : '尚未登入';
+  $('authButton').textContent = session ? '登出' : 'Google 登入';
+  $('accountName').textContent = session ? session.user.email : '訪客';
+  $('accountStatus').textContent = session ? '已登入' : '尚未登入';
+  document.querySelector('.account-avatar').textContent = session ? (session.user.email?.[0] || '我').toUpperCase() : '訪';
   $('startButton').textContent = session ? '開始測驗' : '登入後開始測驗';
   $('adminNav').classList.toggle('hidden', !isAdmin());
 }
@@ -126,6 +128,7 @@ $('startButton').addEventListener('click', startQuiz);
 $('retryButton').addEventListener('click', startQuiz);
 $('adminNav').addEventListener('click', openAdmin);
 $('closeAdmin').addEventListener('click', () => show('homeView'));
+$('studentNav').addEventListener('click', () => show('homeView'));
 $('cancelEdit').addEventListener('click', () => $('editDialog').close());
 $('editForm').addEventListener('submit', saveQuestion);
 document.querySelectorAll('[data-answer]').forEach(button => button.addEventListener('click', () => chooseAnswer(button.dataset.answer === 'true')));
